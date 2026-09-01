@@ -139,10 +139,15 @@
       background-position:center top, center 1450px;
       background-attachment:scroll;
       background-repeat:no-repeat;
+      /* A imagem mobile mede 853x1545: a página termina exatamente no seu último pixel. */
+      height:calc(100vw * 1545 / 853);
+      min-height:calc(100vw * 1545 / 853);
+      max-height:calc(100vw * 1545 / 853);
+      overflow:hidden;
+      background-color:transparent;
     }
     /* Fundo contínuo: a fotografia principal cobre o topo e a extensão de madeira
        continua a partir da zona inferior, sem deixar a cor castanha do body. */
-    min-height:2150px;
     background-color:transparent;
     /* A própria fotografia mobile já contém a continuação do chão e o frame.
        Não colocar uma camada castanha por cima depois do frame. */
@@ -153,16 +158,16 @@
     .page > .rule,
     .page > .date,
     .page > .message,
-    .page > .footer-note{visibility:visible;position:absolute;top:2020px;left:0;width:100%;font-size:12px;letter-spacing:2.5px;color:rgba(245,240,230,.92);z-index:4}
+    .page > .footer-note{display:none !important}
     .page > .eyebrow{height:270px;margin:0}
     .page > .ornament,.page > .names,.page > .rule,.page > .date,.page > .message{height:0;margin:0}
     .upload-card{
       position:absolute;
-      top:988px;
-      left:9.8%;
-      width:80.4%;
+      top:calc(100vw * 1018 / 853);
+      left:calc(100vw * 85 / 853);
+      width:calc(100vw * 681 / 853);
       padding:0;
-      min-height:505px;
+      min-height:calc(100vw * 527 / 853);
       background:transparent;
       border:none;
       box-shadow:none;
@@ -177,16 +182,15 @@
     }
     .dropzone{
       position:absolute;
-      top:174px;left:5.3%;width:89.4%;height:215px;
+      top:calc(100vw * 213 / 853);
+      left:calc(100vw * 37 / 853);
+      width:calc(100vw * 606 / 853);
+      height:calc(100vw * 246 / 853);
       padding:0;border:1.5px dashed rgba(232,213,163,.78);
       border-radius:4px;display:block;background:transparent;
     }
     .dropzone svg,.dropzone-label{visibility:hidden}
-    .send-btn{
-      position:absolute;left:5.3%;top:408px;width:89.4%;height:74px;
-      margin:0;background:transparent;color:transparent;border:0;
-      border-radius:5px;
-    }
+    .send-btn{display:none !important}
     .filelist,.feedback{visibility:hidden}
     /* The real file picker remains available through the transparent dropzone. */
   }
@@ -285,10 +289,18 @@
     sendBtn.disabled = selectedFiles.length === 0;
   }
 
-  fileInput.addEventListener('change', (e) => {
+  fileInput.addEventListener('change', async (e) => {
     selectedFiles = Array.from(e.target.files);
     renderFileList();
     feedback.textContent = '';
+    // No mobile o layout termina no cartão: as fotografias são enviadas
+    // automaticamente após a seleção, sem criar conteúdo abaixo do frame.
+    if (window.matchMedia('(max-width:700px)').matches && selectedFiles.length) {
+      sendBtn.disabled = true;
+      for (let i = 0; i < selectedFiles.length; i++) {
+        await uploadOne(selectedFiles[i], i);
+      }
+    }
   });
 
   ['dragover','dragenter'].forEach(evt =>

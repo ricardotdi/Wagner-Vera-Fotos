@@ -140,13 +140,9 @@
       background-attachment:scroll;
       background-repeat:no-repeat;
     }
-    .page::after{
-      content:"";
-      position:absolute;
-      left:0;right:0;top:100%;height:1200px;
-      background:linear-gradient(180deg,#805f43 0%,#705039 100%);
-      z-index:-1;
-    }
+    /* A própria fotografia mobile já contém a continuação do chão e o frame.
+       Não colocar uma camada castanha por cima depois do frame. */
+    .page::after{display:none !important}
     .page > .eyebrow,
     .page > .ornament,
     .page > .names,

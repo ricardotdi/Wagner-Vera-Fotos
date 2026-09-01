@@ -325,9 +325,6 @@
 
 </div>
 
-<!-- iframe oculto usado para submeter cada foto sem sair da página -->
-<iframe name="upload_target" style="display:none"></iframe>
-
 <script>
   // ATENÇÃO: substituir pelo URL de implementação do Google Apps Script
   const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0eFaI7nF15EFyw6prVJTojXONsrEvsW0KXuD0LDjX-RIhCsBj8roN2JUCRFQX_f3I/exec";
@@ -371,41 +368,22 @@
   });
 
   function uploadOne(file, index){
-    return new Promise((resolve) => {
-      const row = document.getElementById('file-row-' + index);
-      const statusEl = row.querySelector('.status');
-      statusEl.textContent = 'a enviar…';
+    const row = document.getElementById('file-row-' + index);
+    const statusEl = row.querySelector('.status');
+    statusEl.textContent = 'a enviar…';
 
-      const form = document.createElement('form');
-      form.action = SCRIPT_URL;
-      form.method = 'POST';
-      form.enctype = 'multipart/form-data';
-      form.target = 'upload_target';
-      form.style.display = 'none';
+    const formData = new FormData();
+    formData.append('foto', file, file.name);
 
-      const dt = new DataTransfer();
-      dt.items.add(file);
-
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.name = 'foto';
-      input.files = dt.files;
-
-      form.appendChild(input);
-      document.body.appendChild(form);
-
-      const iframe = document.querySelector('iframe[name="upload_target"]');
-      const onLoad = () => {
+    return fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData })
+      .then(() => {
         statusEl.textContent = 'enviada ✓';
         row.classList.add('done');
-        iframe.removeEventListener('load', onLoad);
-        form.remove();
-        resolve();
-      };
-      iframe.addEventListener('load', onLoad);
-
-      form.submit();
-    });
+      })
+      .catch(() => {
+        statusEl.textContent = 'erro';
+        row.classList.add('error');
+      });
   }
 
   sendBtn.addEventListener('click', async () => {

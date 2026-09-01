@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wagner &amp; Vera — 10.10.2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy-deep:#0a1c33;
+    --navy:#0f2847;
+    --navy-light:#1c3a63;
+    --gold:#c9a961;
+    --gold-light:#e8d5a3;
+    --cream:#f5f0e6;
+    --line:rgba(201,169,97,0.35);
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  html,body{
+    background: radial-gradient(ellipse at top, var(--navy) 0%, var(--navy-deep) 65%);
+    color:var(--cream);
+    font-family:'Montserrat',sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+
+  body{
+    display:flex;
+    justify-content:center;
+    padding:0 24px;
+  }
+
+  .page{
+    width:100%;
+    max-width:560px;
+    padding:64px 0 80px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+  }
+
+  .eyebrow{
+    font-size:12px;
+    letter-spacing:0.28em;
+    color:var(--gold-light);
+    font-weight:400;
+    margin-bottom:28px;
+    opacity:0.85;
+  }
+
+  .ornament{
+    width:120px;
+    height:auto;
+    margin-bottom:28px;
+    opacity:0.95;
+  }
+
+  .ornament path, .ornament circle{
+    stroke:var(--gold);
+  }
+
+  .names{
+    font-family:'Cormorant Garamond',serif;
+    font-weight:500;
+    font-size:clamp(40px, 9vw, 58px);
+    line-height:1.1;
+    letter-spacing:0.01em;
+  }
+
+  .names .amp{
+    display:block;
+    font-style:italic;
+    font-weight:400;
+    color:var(--gold-light);
+    font-size:0.55em;
+    margin:6px 0;
+  }
+
+  .rule{
+    width:64px;
+    height:1px;
+    background:var(--gold);
+    margin:26px 0;
+    opacity:0.6;
+  }
+
+  .date{
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px;
+    letter-spacing:0.18em;
+    color:var(--gold-light);
+    font-weight:500;
+    margin-bottom:36px;
+  }
+
+  .message{
+    font-size:15px;
+    line-height:1.85;
+    font-weight:300;
+    color:var(--cream);
+    opacity:0.92;
+    max-width:400px;
+    margin-bottom:48px;
+  }
+
+  .message strong{
+    font-weight:500;
+    color:var(--gold-light);
+  }
+
+  /* Upload card */
+  .upload-card{
+    width:100%;
+    background:linear-gradient(180deg, rgba(28,58,99,0.55), rgba(10,28,51,0.55));
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:40px 28px;
+    position:relative;
+  }
+
+  .upload-card::before,
+  .upload-card::after{
+    content:'';
+    position:absolute;
+    width:18px;
+    height:18px;
+    border:1px solid var(--gold);
+    opacity:0.55;
+  }
+  .upload-card::before{ top:-1px; left:-1px; border-right:none; border-bottom:none; }
+  .upload-card::after{ bottom:-1px; right:-1px; border-left:none; border-top:none; }
+
+  .upload-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:24px;
+    font-weight:500;
+    margin-bottom:8px;
+  }
+
+  .upload-sub{
+    font-size:12.5px;
+    color:var(--gold-light);
+    opacity:0.75;
+    margin-bottom:28px;
+    letter-spacing:0.02em;
+  }
+
+  .dropzone{
+    border:1.5px dashed var(--line);
+    border-radius:3px;
+    padding:32px 16px;
+    cursor:pointer;
+    transition:border-color 0.25s ease, background 0.25s ease;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
+  }
+
+  .dropzone:hover, .dropzone.dragover{
+    border-color:var(--gold);
+    background:rgba(201,169,97,0.06);
+  }
+
+  .dropzone svg{
+    width:30px;
+    height:30px;
+    opacity:0.8;
+  }
+
+  .dropzone-label{
+    font-size:13.5px;
+    font-weight:400;
+    color:var(--cream);
+  }
+
+  .dropzone-label span{
+    color:var(--gold-light);
+    text-decoration:underline;
+    text-underline-offset:3px;
+  }
+
+  input[type=file]{ display:none; }
+
+  .filelist{
+    margin-top:20px;
+    text-align:left;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    max-height:140px;
+    overflow-y:auto;
+  }
+
+  .filelist::-webkit-scrollbar{ width:4px; }
+  .filelist::-webkit-scrollbar-thumb{ background:var(--line); }
+
+  .file-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:12.5px;
+    color:var(--cream);
+    opacity:0.85;
+    padding:4px 2px;
+    border-bottom:1px solid rgba(201,169,97,0.12);
+  }
+
+  .file-row .status{
+    font-size:11px;
+    letter-spacing:0.04em;
+    color:var(--gold-light);
+    white-space:nowrap;
+    margin-left:10px;
+  }
+
+  .file-row.done .status{ color:#8fbf9b; }
+  .file-row.error .status{ color:#d98f8f; }
+
+  .send-btn{
+    margin-top:24px;
+    width:100%;
+    background:var(--gold);
+    color:var(--navy-deep);
+    border:none;
+    border-radius:3px;
+    padding:14px;
+    font-family:'Montserrat',sans-serif;
+    font-size:13px;
+    font-weight:500;
+    letter-spacing:0.06em;
+    cursor:pointer;
+    transition:background 0.2s ease, opacity 0.2s ease;
+  }
+
+  .send-btn:hover{ background:var(--gold-light); }
+  .send-btn:disabled{ opacity:0.45; cursor:not-allowed; }
+
+  .feedback{
+    margin-top:18px;
+    font-size:13px;
+    min-height:18px;
+    color:var(--gold-light);
+  }
+
+  .footer-note{
+    margin-top:44px;
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    color:var(--cream);
+    opacity:0.45;
+  }
+
+  @media (max-width:420px){
+    .page{ padding:48px 0 56px; }
+    .upload-card{ padding:32px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="eyebrow">CONVIDAMOS-VOS A PARTILHAR ESTE DIA</div>
+
+  <!-- Ornamento: árvore da vida em traço fino -->
+  <svg class="ornament" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="50" cy="50" r="46" stroke-width="0.8" opacity="0.5"/>
+    <path d="M50 82 L50 60" stroke-width="1"/>
+    <path d="M50 60 C 40 55, 32 48, 28 34" stroke-width="1"/>
+    <path d="M50 60 C 60 55, 68 48, 72 34" stroke-width="1"/>
+    <path d="M50 68 C 43 64, 37 60, 32 50" stroke-width="0.8"/>
+    <path d="M50 68 C 57 64, 63 60, 68 50" stroke-width="0.8"/>
+    <path d="M28 34 C 24 28, 26 20, 32 16" stroke-width="0.8"/>
+    <path d="M72 34 C 76 28, 74 20, 68 16" stroke-width="0.8"/>
+    <path d="M32 16 C 38 12, 44 14, 46 20" stroke-width="0.7"/>
+    <path d="M68 16 C 62 12, 56 14, 54 20" stroke-width="0.7"/>
+    <path d="M50 82 C 40 84, 30 82, 24 74" stroke-width="0.8"/>
+    <path d="M50 82 C 60 84, 70 82, 76 74" stroke-width="0.8"/>
+    <path d="M24 74 C 20 78, 20 84, 24 88" stroke-width="0.6"/>
+    <path d="M76 74 C 80 78, 80 84, 76 88" stroke-width="0.6"/>
+  </svg>
+
+  <h1 class="names">
+    Wagner
+    <span class="amp">&amp;</span>
+    Vera
+  </h1>
+
+  <div class="rule"></div>
+
+  <div class="date">10 · OUTUBRO · 2026</div>
+
+  <p class="message">
+    Obrigado por celebrarem connosco. Se tiraram alguma fotografia deste dia,
+    adorávamos vê-la — <strong>deixem aqui a vossa memória</strong> para
+    guardarmos para sempre.
+  </p>
+
+  <div class="upload-card">
+    <div class="upload-title">Partilhar fotografias</div>
+    <div class="upload-sub">Sem necessidade de conta ou registo</div>
+
+    <label class="dropzone" id="dropzone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#e8d5a3" stroke-width="1.3">
+        <path d="M12 16V4m0 0L7 9m5-5l5 5" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M4 16v3a2 2 0 002 2h12a2 2 0 002-2v-3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="dropzone-label">Arraste as fotos ou <span>escolha do telemóvel</span></div>
+      <input type="file" id="fileInput" accept="image/*" multiple capture="environment">
+    </label>
+
+    <div class="filelist" id="filelist"></div>
+
+    <button class="send-btn" id="sendBtn" disabled>Enviar fotografias</button>
+    <div class="feedback" id="feedback"></div>
+  </div>
+
+  <div class="footer-note">COM AMOR, WAGNER &amp; VERA</div>
+
+</div>
+
+<!-- iframe oculto usado para submeter cada foto sem sair da página -->
+<iframe name="upload_target" style="display:none"></iframe>
+
+<script>
+  // ATENÇÃO: substituir pelo URL de implementação do Google Apps Script
+  const SCRIPT_URL = "COLOCAR_AQUI_O_URL_DO_APPS_SCRIPT";
+
+  const dropzone = document.getElementById('dropzone');
+  const fileInput = document.getElementById('fileInput');
+  const filelist = document.getElementById('filelist');
+  const sendBtn = document.getElementById('sendBtn');
+  const feedback = document.getElementById('feedback');
+
+  let selectedFiles = [];
+
+  function renderFileList(){
+    filelist.innerHTML = '';
+    selectedFiles.forEach((file, i) => {
+      const row = document.createElement('div');
+      row.className = 'file-row';
+      row.id = 'file-row-' + i;
+      row.innerHTML = `<span>${file.name}</span><span class="status">por enviar</span>`;
+      filelist.appendChild(row);
+    });
+    sendBtn.disabled = selectedFiles.length === 0;
+  }
+
+  fileInput.addEventListener('change', (e) => {
+    selectedFiles = Array.from(e.target.files);
+    renderFileList();
+    feedback.textContent = '';
+  });
+
+  ['dragover','dragenter'].forEach(evt =>
+    dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); })
+  );
+  ['dragleave','drop'].forEach(evt =>
+    dropzone.addEventListener(evt, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); })
+  );
+  dropzone.addEventListener('drop', (e) => {
+    const dropped = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+    selectedFiles = dropped;
+    renderFileList();
+  });
+
+  function uploadOne(file, index){
+    return new Promise((resolve) => {
+      const row = document.getElementById('file-row-' + index);
+      const statusEl = row.querySelector('.status');
+      statusEl.textContent = 'a enviar…';
+
+      const form = document.createElement('form');
+      form.action = SCRIPT_URL;
+      form.method = 'POST';
+      form.enctype = 'multipart/form-data';
+      form.target = 'upload_target';
+      form.style.display = 'none';
+
+      const dt = new DataTransfer();
+      dt.items.add(file);
+
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.name = 'foto';
+      input.files = dt.files;
+
+      form.appendChild(input);
+      document.body.appendChild(form);
+
+      const iframe = document.querySelector('iframe[name="upload_target"]');
+      const onLoad = () => {
+        statusEl.textContent = 'enviada ✓';
+        row.classList.add('done');
+        iframe.removeEventListener('load', onLoad);
+        form.remove();
+        resolve();
+      };
+      iframe.addEventListener('load', onLoad);
+
+      form.submit();
+    });
+  }
+
+  sendBtn.addEventListener('click', async () => {
+    if (selectedFiles.length === 0) return;
+    sendBtn.disabled = true;
+    feedback.textContent = `A enviar 0 de ${selectedFiles.length}…`;
+
+    for (let i = 0; i < selectedFiles.length; i++){
+      await uploadOne(selectedFiles[i], i);
+      feedback.textContent = `A enviar ${i+1} de ${selectedFiles.length}…`;
+      await new Promise(r => setTimeout(r, 350));
+    }
+
+    feedback.textContent = 'Obrigado! As vossas fotografias foram guardadas com carinho. 💛';
+    sendBtn.textContent = 'Enviado';
+  });
+</script>
+
+</body>
+</html>

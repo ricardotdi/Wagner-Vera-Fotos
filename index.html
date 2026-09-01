@@ -367,23 +367,34 @@
     renderFileList();
   });
 
-  function uploadOne(file, index){
+  function fileToBase64(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function uploadOne(file, index){
     const row = document.getElementById('file-row-' + index);
     const statusEl = row.querySelector('.status');
     statusEl.textContent = 'a enviar…';
 
-    const formData = new FormData();
-    formData.append('foto', file, file.name);
-
-    return fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: formData })
-      .then(() => {
-        statusEl.textContent = 'enviada ✓';
-        row.classList.add('done');
-      })
-      .catch(() => {
-        statusEl.textContent = 'erro';
-        row.classList.add('error');
+    try {
+      const base64 = await fileToBase64(file);
+      await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ filename: file.name, mimeType: file.type || 'image/jpeg', data: base64 })
       });
+      statusEl.textContent = 'enviada ✓';
+      row.classList.add('done');
+    } catch (err) {
+      statusEl.textContent = 'erro';
+      row.classList.add('error');
+    }
   }
 
   sendBtn.addEventListener('click', async () => {

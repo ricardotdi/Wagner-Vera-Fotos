@@ -62,9 +62,9 @@ async function confirmarEnvio(antes,nomes){
 }
 
 /* Cada envio ao Apps Script leva vários segundos de ida e volta, e em fila
-   isso soma. Três ao mesmo tempo cortam o tempo para cerca de um terço. */
+   isso soma. Cinco ao mesmo tempo tratam um lote normal numa só ronda. */
 async function enviarTodas(lista,progresso){
-  const CONC=3; let feitas=0, proxima=0;
+  const CONC=5; let feitas=0, proxima=0;
   async function trabalhador(){
     for(;;){
       const i=proxima++; if(i>=lista.length)return;
@@ -78,7 +78,7 @@ async function enviarTodas(lista,progresso){
 send.onclick=async()=>{
   const toSend=sendable(); if(!toSend.length)return;
   send.disabled=true;
-  const antes=await contarPasta();
+  const antesP=contarPasta();          /* arranca já, em paralelo com os envios */
   const nomes=toSend.map(f=>f.name);
   diz('A enviar 0 de '+toSend.length+'…');
   try{
@@ -88,7 +88,7 @@ send.onclick=async()=>{
     send.disabled=false; return;
   }
   diz('A confirmar…');
-  const r=await confirmarEnvio(antes,nomes);
+  const r=await confirmarEnvio(await antesP,nomes);
   if(r.estado==='ok'){
     files=[]; render();
     diz(nomes.length===1?'Fotografia guardada. Obrigado! 💛'

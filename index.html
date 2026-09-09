@@ -31,30 +31,48 @@ function diz(txt,tipo){feedback.className='feedback'+(tipo?' '+tipo:'');feedback
 async function contarPasta(){
   try{const c=await jsonp('action=count',15000);return (c&&c.ok)?c.total:null}catch(e){return null}
 }
-async function nomesNaPasta(){
+async function nomesNaPasta(quantos){
+  /* pedir só as que precisamos: cada miniatura custa tempo ao Apps Script */
   try{
-    const l=await jsonp('action=list&limit='+thumbLimit+(paged?'&offset=0':''),60000);
+    const n=Math.max(1,Math.min(quantos||6,thumbLimit));
+    const l=await jsonp('action=list&limit='+n+(paged?'&offset=0':''),45000);
     return (l&&l.ok)?(l.photos||[]).map(p=>p.name):null;
   }catch(e){return null}
 }
 
+/* A contagem é barata (o Apps Script só percorre a pasta). A lista é cara,
+   porque gera uma miniatura por ficheiro — por isso só lá vamos quando a
+   contagem não confirma o envio. */
 async function confirmarEnvio(antes,nomes){
-  const N=nomes.length, aVerificar=Math.min(N,thumbLimit);
-  let depois=null, encontrados=0;
-  for(let t=0;t<4;t++){
-    await new Promise(r=>setTimeout(r,t?2500:1000));
+  const N=nomes.length;
+  let depois=null;
+  for(let t=0;t<3;t++){
+    await new Promise(r=>setTimeout(r,t?1500:600));
     const c=await contarPasta(); if(c!==null)depois=c;
-    const na=await nomesNaPasta();
-    if(na)encontrados=nomes.filter(n=>na.indexOf(n)>=0).length;
-    const porNome=encontrados>=aVerificar;
-    const porContagem=(antes!==null&&depois!==null&&depois-antes>=N);
-    if(porNome||porContagem)return{estado:'ok'};
+    if(antes!==null&&depois!==null&&depois-antes>=N)return{estado:'ok'};
   }
-  if(antes===null&&depois===null&&!encontrados)return{estado:'incerto'};
+  // a contagem não chegou: agora sim, confirmar pelos nomes
+  const na=await nomesNaPasta(N);
+  const encontrados=na?nomes.filter(n=>na.indexOf(n)>=0).length:0;
+  if(encontrados>=Math.min(N,thumbLimit))return{estado:'ok'};
+  if(antes===null&&depois===null&&na===null)return{estado:'incerto'};
   const chegaram=Math.max(encontrados,(antes!==null&&depois!==null)?Math.max(0,depois-antes):0);
   if(chegaram>=N)return{estado:'ok'};
-  return {estado:'falhou',chegaram:chegaram,
-          faltam:nomes.filter((n,i)=>i>=chegaram)};
+  return {estado:'falhou',chegaram:chegaram,faltam:nomes.filter((n,i)=>i>=chegaram)};
+}
+
+/* Cada envio ao Apps Script leva vários segundos de ida e volta, e em fila
+   isso soma. Três ao mesmo tempo cortam o tempo para cerca de um terço. */
+async function enviarTodas(lista,progresso){
+  const CONC=3; let feitas=0, proxima=0;
+  async function trabalhador(){
+    for(;;){
+      const i=proxima++; if(i>=lista.length)return;
+      await upload(lista[i],i);
+      progresso(++feitas);
+    }
+  }
+  await Promise.all(Array.from({length:Math.min(CONC,lista.length)},trabalhador));
 }
 
 send.onclick=async()=>{
@@ -62,11 +80,9 @@ send.onclick=async()=>{
   send.disabled=true;
   const antes=await contarPasta();
   const nomes=toSend.map(f=>f.name);
+  diz('A enviar 0 de '+toSend.length+'…');
   try{
-    for(let i=0;i<toSend.length;i++){
-      diz('A enviar '+(i+1)+' de '+toSend.length+'…');
-      await upload(toSend[i],i);
-    }
+    await enviarTodas(toSend,n=>diz('A enviar '+n+' de '+toSend.length+'…'));
   }catch(e){
     diz('Não foi possível enviar. Verifique a ligação e tente de novo.','bad');
     send.disabled=false; return;

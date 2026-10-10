@@ -32,7 +32,7 @@ let files=[];
 const MAX_MB=50, MAX_BYTES=MAX_MB*1024*1024;
 function sendable(){return files.filter(f=>f.size<=MAX_BYTES)}
 function render(){list.innerHTML=''; files.forEach(f=>{const big=f.size>MAX_BYTES;const r=document.createElement('div');r.className='file-row'+(big?' too-big':'');r.innerHTML='<span>'+f.name+'</span><span>'+(big?'acima de '+MAX_MB+' MB':Math.round(f.size/1024)+' KB')+'</span>';list.appendChild(r)});const n=files.length-sendable().length;send.disabled=!sendable().length;if(n){sizeWarn.textContent=(n===1?'1 ficheiro passa dos '+MAX_MB+' MB e não será enviado.':n+' ficheiros passam dos '+MAX_MB+' MB e não serão enviados.');sizeWarn.hidden=false}else{sizeWarn.hidden=true}}
-zone.onclick=()=>input.click(); input.onchange=e=>{files=[...e.target.files];render()};
+input.onchange=e=>{const f=[...(e.target.files||[])]; if(!f.length)return; files=f; render()};
 ['dragenter','dragover'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.add('drag')}));
 ['dragleave','drop'].forEach(ev=>zone.addEventListener(ev,e=>{e.preventDefault();zone.classList.remove('drag')}));
 zone.addEventListener('drop',e=>{files=[...e.dataTransfer.files].filter(f=>f.type.startsWith('image/'));render()});

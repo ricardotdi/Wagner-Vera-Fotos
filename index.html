@@ -7,11 +7,11 @@
 <div class="lightbox" id="lightbox" hidden><button class="lb-close" id="lbClose" type="button" aria-label="Fechar">✕</button><button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Anterior">‹</button><img id="lbImg" alt=""><button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Seguinte">›</button><div class="lb-info" id="lbInfo"></div></div><script>const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx0eFaI7nF15EFyw6prVJTojXONsrEvsW0KXuD0LDjX-RIhCsBj8roN2JUCRFQX_f3I/exec";
 const home=document.getElementById('home'), photos=document.getElementById('photosPanel'), menu=document.getElementById('menuPanel');
 const fim=document.getElementById('fim');
-/* 11/10/2026, 17h00 em Portugal. Em outubro Portugal está em UTC+1 (a hora
-   de verão só termina a 25), por isso 17h00 daqui são 16h00 UTC. Fixamos o
+/* 11/10/2026, 17h00 nos Açores. Em outubro os Açores estão em UTC+0 (a hora
+   de verão só termina a 25), por isso as 17h00 de lá são 17h00 UTC — no continente são 18h00. Fixamos o
    instante em UTC para que feche à mesma hora real seja onde for.
    Para ver a página antes do tempo: ?fim=1   Para voltar ao site: ?fim=0 */
-const FIM_UTC = Date.UTC(2026, 9, 11, 16, 0, 0);
+const FIM_UTC = Date.UTC(2026, 9, 11, 17, 0, 0);
 function acabou(){
   const q=new URLSearchParams(location.search).get('fim');
   if(q==='1')return true;
